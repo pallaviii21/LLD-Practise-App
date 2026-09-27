@@ -238,8 +238,10 @@ Include an entry for each criterion listed above. Be specific and constructive i
     let parsed: AIEvaluationResponse;
 
     try {
-      parsed = JSON.parse(raw);
-    } catch {
+      const cleanedRaw = raw.replace(/^```(json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+      parsed = JSON.parse(cleanedRaw);
+    } catch (err) {
+      console.error('Raw AI response:', raw);
       throw new Error('AI returned invalid JSON');
     }
 
