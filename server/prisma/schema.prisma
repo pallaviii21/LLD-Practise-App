@@ -1,0 +1,45 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Problem {
+  id               String   @id @default(uuid())
+  title            String
+  slug             String   @unique
+  description      String
+  difficulty       String   // EASY, MEDIUM, HARD
+  requirements     Json     // Requirement[]
+  constraints      Json     // string[]
+  submissionConfig Json     // SubmissionConfig
+  evaluationConfig Json     // EvaluationConfig
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  attempts Attempt[]
+
+  @@map("problems")
+}
+
+model Attempt {
+  id          String    @id @default(uuid())
+  problemId   String
+  status      String    @default("DRAFT") // AttemptStatus
+  submission  Json?     // Submission
+  evaluation  Json?     // Evaluation
+  createdAt   DateTime  @default(now())
+  submittedAt DateTime?
+  updatedAt   DateTime  @updatedAt
+
+  problem Problem @relation(fields: [problemId], references: [id])
+
+  @@map("attempts")
+}
